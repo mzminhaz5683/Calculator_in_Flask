@@ -9,9 +9,9 @@ class NameForm(Form):
     submit = SubmitField('Submit')
 
 class CalcForm(Form):
-    name1 = FloatField('What is your first value?', validators=[Required()], default=0)
-    name2 = StringField('Operation? (+, -, *, /)', validators=[Required()])
-    name3 = FloatField('What is your last value?', validators=[Required()], default=0)
+    name1 = FloatField('What is your first value?', default=0)
+    name2 = StringField('Operation? (+, -, *, /, **, %)', validators=[Required()])
+    name3 = FloatField('What is your last value?', default=0)
     submit = SubmitField('Submit')
 
 app = Flask(__name__)
@@ -31,33 +31,47 @@ def index():
     return render_template('index.html', form=form, name=name)
 
 """ Load personal"""
+def calculator(a, op, b):
+    flag = r =  0
+    if op == "+":
+        r = a + b
+    elif op == "-":
+        r = a - b
+    elif op == "*":
+        r = a * b
+    elif op == "**":
+        r = a ** b
+    elif op == "%":
+        r = a % b
+    elif op == "/":
+        try:
+            r = a / b
+        except:
+            r = "Infinite"
+    else:
+        flag = 1
+
+    return r, flag
+
+
 @app.route('/calculator', methods=['GET', 'POST'])
 def calc():
     name = None
     form = CalcForm()
+
     if form.validate_on_submit():
         a = form.name1.data
         op = form.name2.data
         b = form.name3.data
 
-        flag = r =  0
-        if op == "+":
-            r = a + b
-        elif op == "-":
-            r = a - b
-        elif op == "*":
-            r = a * b
-        elif op == "/":
+        r, flag = calculator(a, op, b)
+        if flag == 0:
             try:
-                r = a / b
+                name = ("Result of the Operation : %.4f" % r)
             except:
-                r = 0
+                name = ("Result of the Operation : " + r)
         else:
             name = "Wrong Operation"
-            flag = 1
-
-        if flag == 0:
-            name = ("Result of the Operation : %.4f" % r)
 
     return render_template('calc.html', form=form, name=name)
 """ Load personal"""
