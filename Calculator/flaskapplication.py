@@ -10,7 +10,7 @@ class NameForm(Form):
 
 class CalcForm(Form):
     name1 = FloatField('What is your first value?', default=0)
-    name2 = StringField('Operation? (+, -, *, /, **, %)', validators=[Required()])
+    name2 = StringField('Operation? (+, -, *, /, ^, %)', validators=[Required()])
     name3 = FloatField('What is your last value?', default=0)
     submit = SubmitField('Submit')
 
@@ -33,13 +33,14 @@ def index():
 """ Load personal"""
 def calculator(a, op, b):
     flag = r =  0
+    str = ''
     if op == "+":
         r = a + b
     elif op == "-":
         r = a - b
     elif op == "*":
         r = a * b
-    elif op == "**":
+    elif op == "^":
         r = a ** b
     elif op == "%":
         r = a % b
@@ -51,7 +52,8 @@ def calculator(a, op, b):
     else:
         flag = 1
 
-    return r, flag
+    st = "{0} {1} {2} = ".format(a, op, b)
+    return r, flag, st
 
 
 @app.route('/calculator', methods=['GET', 'POST'])
@@ -64,12 +66,12 @@ def calc():
         op = form.name2.data
         b = form.name3.data
 
-        r, flag = calculator(a, op, b)
+        r, flag, st = calculator(a, op, b)
         if flag == 0:
             try:
-                name = ("Result of the Operation : %.4f" % r)
+                name = ("Result of the Operation :: "+st+"%.1f" % r)
             except:
-                name = ("Result of the Operation : " + r)
+                name = ("Result of the Operation :: "+st+r)
         else:
             name = "Wrong Operation"
 
